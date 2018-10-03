@@ -31,9 +31,8 @@ while True :
     if (fork == 0):
         print("connection rec'd from", addr)
 
-
         from framedSock import framedSend, framedReceive
-        fName = framedReceive(s, debug)     # Receive file name
+        fName = framedReceive(sock, debug)     # Receive file name
         oFile = open(fName, "wb")
         while True:             # Once file transfer is done use system exit
             payload = framedReceive(sock, debug)
@@ -41,6 +40,8 @@ while True :
             if not payload:
                 break
             if b'%%e' in payload :
+                oFile.close()       # closes file we're writing to
                 sys.exit(0)
-            payload += b"!"             # make emphatic!
-            framedSend(sock, payload, debug)
+            oFile.write(payload)    # writes what is recieved aka payload to the file
+
+     

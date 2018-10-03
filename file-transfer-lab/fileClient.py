@@ -8,9 +8,17 @@ import params
 
 from framedSock import framedSend, framedReceive
 
+print( "would you like to use stammer proxy or file server?" )
+
+choice = input()
+
+if (choice == "stammer proxy") :
+    ipAd = "127.0.0.1:50000"
+elif (choice == "file server") :
+    ipAd = "127.0.0.1:50001"
 
 switchesVarDefaults = (
-    (('-s', '--server'), 'server', "127.0.0.1:50001"),
+    (('-s', '--server'), 'server', ipAd),
     (('-d', '--debug'), "debug", False), # boolean (set if present)
     (('-?', '--usage'), "usage", False), # boolean (set if present)
     )
@@ -57,8 +65,8 @@ if s is None:
     sys.exit(1)
 
 print("Enter file name: ")
-fileName = input()
-oFile = open(fileName, "rb")
+fileName = input()      # saves file name
+oFile = open(fileName, "rb")        # opens file to read
 data = oFile.read()    
 
 framedSend(s, fileName.encode(), debug)
@@ -68,7 +76,6 @@ i=0
 while i <= len(data):
     str = data[i:i+100]        # open file duh not file name reds every 100 bytes
     framedSend(s, str, debug)   #sends every 100 bytes
-    print("received:", framedReceive(s, debug))
     i+=100
 
 framedSend(s, b"%%e", debug)  # signal end of input
