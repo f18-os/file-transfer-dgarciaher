@@ -23,7 +23,7 @@ bindAddr = ("127.0.0.1", listenPort)
 lsock.bind(bindAddr)
 lsock.listen(5)
 
-while True : 
+while True :                            # keeps server going when client finishes  
     print("listening on:", bindAddr)
 
     sock, addr = lsock.accept()
@@ -32,16 +32,19 @@ while True :
         print("connection rec'd from", addr)
 
         from framedSock import framedSend, framedReceive
-        fName = framedReceive(sock, debug)     # Receive file name
-        oFile = open(fName, "wb")
-        while True:             # Once file transfer is done use system exit
-            payload = framedReceive(sock, debug)
-            if debug: print("rec'd: ", payload)
-            if not payload:
-                break
-            if b'%%e' in payload :
-                oFile.close()       # closes file we're writing to
-                sys.exit(0)
-            oFile.write(payload)    # writes what is recieved aka payload to the file
+        try:
+            fName = framedReceive(sock, debug)     # Receive file name
+            oFile = open(fName, "wb")
+            while True:             # Once file transfer is done use system exit, while used since we don't know how big the file is 
+                payload = framedReceive(sock, debug)
+                if debug: print("rec'd: ", payload)
+                if not payload:
+                    break
+                if b'%%e' in payload :
+                    oFile.close()       # closes file we're writing to
+                    sys.exit(0)
+                oFile.write(payload)    # writes what is recieved aka payload to the file
+        except ( TypeError ) :
+            sys.exit(1)
 
      

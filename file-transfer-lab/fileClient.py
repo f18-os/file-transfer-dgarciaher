@@ -12,7 +12,7 @@ print( "would you like to use stammer proxy or file server?" )
 
 choice = input()
 
-if (choice == "stammer proxy") :
+if (choice == "stammer proxy") :        # picks stammer proxy or file server depending on user input
     ipAd = "127.0.0.1:50000"
 elif (choice == "file server") :
     ipAd = "127.0.0.1:50001"
@@ -66,16 +66,20 @@ if s is None:
 
 print("Enter file name: ")
 fileName = input()      # saves file name
-oFile = open(fileName, "rb")        # opens file to read
-data = oFile.read()    
 
-framedSend(s, fileName.encode(), debug)
+try:
+    oFile = open(fileName, "rb")        # opens file to read
+    data = oFile.read()    
+
+    framedSend(s, fileName.encode(), debug)     # sends file name to the server 
 
 
-i=0
-while i <= len(data):
-    str = data[i:i+100]        # open file duh not file name reds every 100 bytes
-    framedSend(s, str, debug)   #sends every 100 bytes
-    i+=100
+    i=0
+    while i <= len(data):
+        str = data[i:i+100]        # reads every 100 bytes
+        framedSend(s, str, debug)   #sends every 100 bytes
+        i+=100
 
-framedSend(s, b"%%e", debug)  # signal end of input
+    framedSend(s, b"%%e", debug)  # signal end of input
+except (FileNotFoundError) :                # checks for files that do not exist
+    print("Wrong file or file path")
